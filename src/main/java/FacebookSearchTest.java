@@ -25,8 +25,8 @@ public class FacebookSearchTest {
 
 
     public static void main(String[] args) throws Exception {
-        logger.debug("Starting my test");
-
+        logger.info("Logback initialized");
+        logger.info("Starting the test");
 
         String email = null;
         String password = null;
@@ -43,6 +43,7 @@ public class FacebookSearchTest {
         }
         WebDriver driver = null;
         try {
+            logger.info("Instantiating and launching ChromeDriver from my local machine.");
             // Set the path to the ChromeDriver executable
             System.setProperty("/users/johanlund/Downloads/Chromedriver_mac64\\chromedriver", "path/to/chromedriver");
 
@@ -54,14 +55,15 @@ public class FacebookSearchTest {
             // Launch ChromeDriver
             driver = new ChromeDriver(options);
             driver.manage().window().maximize();
+            logger.info("Launch successful!");
         } catch (WebDriverException e) {
             // Handle any exceptions that might occur while launching the ChromeDriver
-            e.printStackTrace();
+            logger.error("Could not launch ChromeDriver", e);
+            System.exit(1);
         }
 
 
         // Go to the Facebook login page
-        assert driver != null;
         driver.get("https://www.facebook.com/login.php");
 
         WebElement button = driver.findElement(By.xpath("//button[@data-testid='cookie-policy-manage-dialog-accept-button']"));
@@ -102,16 +104,18 @@ public class FacebookSearchTest {
                 Thread.sleep(1000);
                 if (driver.getPageSource().contains("Skandinaviens nordligaste tekniska universitet")) {
                     siteFound = true;
-                    System.out.println("The site was found!");
+                    logger.info("The site was found!");
                 }
                 i++;
 
             }
             if (!siteFound) {
-                System.out.println("The site was not found!");
+                logger.error("The site was not found!");
+                System.exit(1);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error("The search field or the site was not found", e);
+            System.exit(1);
         }
         Thread.sleep(5000);
         // Close the browser
